@@ -18,8 +18,9 @@ urlpatterns = [
     path('reviews/', include('reviews.urls', namespace='reviews')),
     path('reports/', include('reports.urls', namespace='reports')),
     path('api/link_telegram_id/', views.link_telegram_id, name='link_telegram_id'),
-
+    path('oauth/', include('social_django.urls', namespace='social')),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
