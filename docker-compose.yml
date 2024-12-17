@@ -1,22 +1,18 @@
 services:
   web:
     build: .
-    container_name: django_backend
+    container_name: web
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
       - ./db.sqlite3:/app/db.sqlite3
-    ports:
-      - "8000:8000"
-    depends_on:
-      - redis
+    env_file:
+      - .env  # Указываем файл .env для загрузки переменных окружения
     environment:
-      - BOT_TOKEN=${BOT_TOKEN}
-      - ADMIN_BOT_TOKEN=${ADMIN_BOT_TOKEN}
-      - ADMIN_TELEGRAM_IDS=${ADMIN_TELEGRAM_IDS}
-      - ADMIN_API_TOKEN=${ADMIN_API_TOKEN}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    ports:
+      - "8000:8000"
     networks:
       - flower_network
 
@@ -28,9 +24,8 @@ services:
       - .:/app
     depends_on:
       - redis
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    env_file:
+      - .env
     networks:
       - flower_network
 
@@ -39,40 +34,56 @@ services:
       context: .
       dockerfile: telegram_bot/Dockerfile
     container_name: client_bot
-    command: python telegram_bot/bot/main.py  # команда для запуска client_bot
+    command: python telegram_bot/bot/main.py
     volumes:
       - .:/app
     depends_on:
       - web
-    environment:
-      BOT_TOKEN: ${BOT_TOKEN}
-      API_URL: http://web:8000
+    env_file:
+      - .env
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     networks:
       - flower_network
 
   admin_bot:
     build:
-      context: .
+      context: ./
       dockerfile: telegramadmin_bot/Dockerfile
     container_name: admin_bot
-    command: python manage.py run_admin_bot  # команда для запуска admin_bot
+    command: python manage.py run_admin_bot
     volumes:
       - .:/app
     depends_on:
       - web
-    environment:
-      ADMIN_BOT_TOKEN: ${ADMIN_BOT_TOKEN}
-      API_URL: http://web:8000
-      ADMIN_API_TOKEN: ${ADMIN_API_TOKEN}
+    env_file:
+      - .env
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     networks:
       - flower_network
-
 
   redis:
     image: redis:latest
     container_name: redis
+    networks:
+      - flower_network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
     ports:
-      - "6379:6379"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./flower_delivery/nginx/ssl:/etc/nginx/ssl:ro
+      - ./staticfiles:/app/staticfiles:ro
+      - ./media:/app/media:rw
+    depends_on:
+      - web
     networks:
       - flower_network
 
