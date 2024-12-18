@@ -19,7 +19,7 @@
 
     <form method="post" action="{% url 'account_login' %}" novalidate>
         {% csrf_token %}
-
+        
         {% if form.non_field_errors %}
             <div class="text-danger mb-3">
                 {{ form.non_field_errors }}
@@ -58,7 +58,7 @@
         <li><a href="{% url 'social:begin' 'vk-oauth2' %}?next={{ request.path }}">VK</a></li>
     </ul>
     
-    <!-- VK Button -->
+    <!-- VK Button (не меняется) -->
     <div>
       <script src="https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js"></script>
       <script type="text/javascript">
@@ -100,13 +100,39 @@
       </script>
     </div>
 
-    <!-- Telegram Button -->
-    <script async src="https://telegram.org/js/telegram-widget.js?15"
+    <!-- Telegram Button с callback -->
+    <script async src="https://telegram.org/js/telegram-widget.js?22"
             data-telegram-login="FDlogin_bot"
             data-size="large"
+            data-radius="20"
             data-userpic="false"
-            data-auth-url="https://vaktest.ru/oauth/complete/telegram"
+            data-onauth="onTelegramAuth(user)"
             data-request-access="write">
+    </script>
+
+    <!-- Функция для обработки аутентификации Telegram -->
+    <script type="text/javascript">
+      function onTelegramAuth(user) {
+        console.log('Telegram user:', user);
+
+        fetch('/oauth/complete/telegram-callback/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: JSON.stringify(user)
+        })
+        .then(response => {
+          if (response.ok) {
+            // Перенаправляем на главную страницу
+            window.location.href = '/';
+          } else {
+            alert('Ошибка аутентификации через Telegram');
+          }
+        })
+        .catch(err => console.error('Ошибка сети:', err));
+      }
     </script>
 
     <hr>
