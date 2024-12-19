@@ -20,7 +20,7 @@ urlpatterns = [
     path('reports/', include('reports.urls', namespace='reports')),
     path('api/link_telegram_id/', views.link_telegram_id, name='link_telegram_id'),
     path('oauth/', include('social_django.urls', namespace='social')),
-    path('oauth/complete/telegram-callback/', telegram_callback, name='telegram_callback'),
+#    path('oauth/complete/telegram-callback/', telegram_callback, name='telegram_callback'),
 ]
 
 
