@@ -183,6 +183,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+FAVICON_PATH = STATIC_URL + 'img/favicon.ico'
+
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
@@ -245,11 +247,9 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 
+SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['state']
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
-SOCIAL_AUTH_CHECK_STATE = False
-
-# SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['state']
-
+SOCIAL_AUTH_CHECK_STATE = True  # Включаем проверку state
 
 
 # Загрузка ключей и секретов из .env файла
@@ -265,8 +265,9 @@ SOCIAL_AUTH_GITHUB_KEY = os.getenv('SOCIAL_AUTH_GITHUB_KEY')
 SOCIAL_AUTH_GITHUB_SECRET = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
 SOCIAL_AUTH_GITHUB_OAUTH2_REDIRECT_URI = os.getenv('SOCIAL_AUTH_GITHUB_OAUTH2_REDIRECT_URI')
 
-SOCIAL_AUTH_TELEGRAM_BOT_TOKEN = os.environ.get('SOCIAL_AUTH_TELEGRAM_BOT_TOKEN')
+SOCIAL_AUTH_TELEGRAM_BOT_TOKEN = os.getenv('SOCIAL_AUTH_TELEGRAM_BOT_TOKEN')
 
+SOCIAL_AUTH_TELEGRAM_REDIRECT_URL = "https://vaktest.ru/oauth/complete/telegram/"
 
 # Другие настройки
 SOCIAL_AUTH_PIPELINE = (
@@ -282,7 +283,7 @@ SOCIAL_AUTH_PIPELINE = (
 #    'users.utils.generate_fake_email',  # ваш кастомный шаг
     'social_core.pipeline.user.get_username',
     'social_core.pipeline.user.create_user',
-#    'users.utils.log_pipeline_step',  # Логирование перед create_user
+    'users.utils.log_pipeline_step',  # Логирование перед create_user
 #    'users.utils.create_user_with_logging',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
@@ -293,13 +294,17 @@ SOCIAL_AUTH_PIPELINE = (
 
 # Session settings
 SESSION_COOKIE_AGE = 1209600  # 2 недели
-SESSION_COOKIE_SECURE = False   # Куки только через HTTPS
+SESSION_COOKIE_NAME = "flowerdelivery_session"
+SESSION_COOKIE_SECURE = True  # Куки только через HTTPS
 SESSION_COOKIE_HTTPONLY = True  # Доступ к куки только серверу
-SESSION_COOKIE_SAMESITE = 'Lax'  # Защита от CSRF
+SESSION_COOKIE_SAMESITE = 'None'  # Защита от атак типа CSRF
+SESSION_COOKIE_DOMAIN = ".vaktest.ru"  # Поддержка www.vaktest.ru
+
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 # SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
 
+CORS_ALLOW_CREDENTIALS = True
 
 LOGGING = {
     'version': 1,
@@ -329,17 +334,41 @@ LOGGING = {
     'loggers': {
         'users.utils': {
             'handlers': ['file', 'console'],
-            'level': 'DEBUG',  # Убедитесь, что этот уровень не выше DEBUG
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'social': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.template': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+        'social.backends': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.contrib.sessions': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'social_core.backends': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
             'propagate': False,
         },
     },
 }
 
-
 # # Загрузка переменных окружения
 # print(f"API_URL from settings: {API_URL}")
 # print(f"ADMIN_TELEGRAM_IDS from settings: {ADMIN_TELEGRAM_IDS}")
-print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
-print(f"DEBUG: {DEBUG}")
-print(f"Loaded ALLOWED_HOSTS from .env: {os.getenv('ALLOWED_HOSTS')}")
-print("DEBUG: generate_fake_email called")
+
+# print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
+# print(f"DEBUG: {DEBUG}")
+# print(f"Loaded ALLOWED_HOSTS from .env: {os.getenv('ALLOWED_HOSTS')}")
+# print("DEBUG: generate_fake_email called")

@@ -36,11 +36,11 @@ def generate_fake_email(strategy, details, user=None, *args, **kwargs):
         logger.debug("Generated fake email: %s", details['email'])
     return {'details': details}
 
-def log_pipeline_step(*args, **kwargs):
-    """
-    Логирование шагов pipeline
-    """
-    logger.debug(f"Pipeline step called with args={args}, kwargs={kwargs}")
+def log_pipeline_step(strategy, details, user=None, *args, **kwargs):
+    import logging
+    logger = logging.getLogger('social')
+    logger.debug(f'Pipeline step: user={user}, details={details}')
+    return
 
 def create_user_with_logging(strategy, details, backend, user=None, *args, **kwargs):
     """
