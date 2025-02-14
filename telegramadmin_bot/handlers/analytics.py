@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from aiogram.types import BufferedInputFile
 import io
 import datetime
-import asyncio  # Импортируем asyncio
+import asyncio
 
 logger = logging.getLogger('telegramadmin_bot')
 
@@ -29,11 +29,6 @@ async def order_analytics(message: types.Message):
         return
 
     try:
-        # Убедимся, что команда вызывается только как /analytics без аргументов
-        if not message.text or message.text.strip() != "/analytics":
-            await message.reply("❗ **Некорректный формат команды. Используйте только:** `/analytics`")
-            return
-
         # Установим период: последние 30 дней
         end_datetime = timezone.now()
         start_datetime = end_datetime - timezone.timedelta(days=30)
@@ -88,6 +83,9 @@ async def order_analytics(message: types.Message):
         ).values('user').distinct().count)()
         returning_customers = unique_customers - new_customers
 
+        retention_rate = (returning_customers / unique_customers * 100) if unique_customers else 0
+        orders_per_customer = total_orders / unique_customers if unique_customers else 0
+
         # Проверяем наличие данных для построения графика
         if not orders_per_day:
             await message.reply("📉 **Нет данных для построения графика.**")
@@ -98,26 +96,34 @@ async def order_analytics(message: types.Message):
             days = [item['day'] for item in orders_per_day]
             order_counts = [item['count'] for item in orders_per_day]
             sales = [item['total_sales'] for item in sales_per_day]
+
             def plot():
-                fig, ax1 = plt.subplots(figsize=(10, 5))
+                try:
+                    # Создаем фигуру и оси
+                    fig, ax1 = plt.subplots(figsize=(10, 5), constrained_layout=True)
 
-                # Линия количества заказов
-                ax1.plot(days, order_counts, marker='o', linestyle='-', color='blue', label="Количество заказов")
-                ax1.set_xlabel('Дата')
-                ax1.set_ylabel('Количество заказов', color='blue')
-                ax1.tick_params(axis='y', labelcolor='blue')
+                    # Линия количества заказов
+                    ax1.plot(days, order_counts, marker='o', linestyle='-', color='blue', label="Количество заказов")
+                    ax1.set_xlabel('Дата')
+                    ax1.set_ylabel('Количество заказов', color='blue')
+                    ax1.tick_params(axis='y', labelcolor='blue')
 
-                # Вторая ось для продаж
-                ax2 = ax1.twinx()
-                ax2.plot(days, sales, marker='x', linestyle='--', color='green', label="Продажи")
-                ax2.set_ylabel('Продажи (₽)', color='green')
-                ax2.tick_params(axis='y', labelcolor='green')
+                    # Вторая ось для продаж
+                    ax2 = ax1.twinx()
+                    ax2.plot(days, sales, marker='x', linestyle='--', color='green', label="Продажи")
+                    ax2.set_ylabel('Продажи (₽)', color='green')
+                    ax2.tick_params(axis='y', labelcolor='green')
 
-                fig.tight_layout()
-                plt.title('Продажи и количество заказов по дням')
-                plt.grid(True)
-                plt.savefig(buf, format='png')
-                plt.close()
+                    # Добавляем заголовок с отступом
+                    plt.title('Продажи и количество заказов по дням', pad=20)
+                    plt.grid(True)
+
+                    # Сохраняем график
+                    plt.savefig(buf, format='png')
+                except Exception as e:
+                    logger.error(f"Ошибка построения графика: {e}")
+                finally:
+                    plt.close()
 
             # Запуск построения графика в отдельном потоке
             await asyncio.to_thread(plot)
@@ -140,8 +146,10 @@ async def order_analytics(message: types.Message):
             f"📈 **Средняя стоимость заказа:** {average_order_value:.2f} ₽\n\n"
             f"👥 **Клиентская аналитика:**\n"
             f"- 🆔 **Уникальные клиенты:** {unique_customers}\n"
-            f"- 🆕 **Новые клиенты:** {new_customers}\n"
-            f"- 🔄 **Возвращающиеся клиенты:** {returning_customers}\n\n"
+            f"- 🔄 **Новые клиенты:** {new_customers}\n"
+            f"- 🔁 **Возвращающиеся клиенты:** {returning_customers}\n"
+            f"- 📊 **Коэффициент возвращаемости клиентов:** {retention_rate:.2f}%\n"
+            f"- 📈 **Средняя частота заказов на клиента:** {orders_per_customer:.2f}\n\n"
             f"📂 **Заказы по статусам:**\n"
         )
         for status_item in orders_per_status:
@@ -176,4 +184,4 @@ async def order_analytics(message: types.Message):
 
     except Exception as e:
         logger.error(f"Ошибка при генерации аналитики: {e}")
-        await message.reply("⚠️ **Произошла ошибка при генерации аналитики.**")
+        await message.reply("⚠ **Произошла ошибка при генерации аналитики.**")

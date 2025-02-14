@@ -1,7 +1,7 @@
 /* Интерактивный фон */
 .interactive-bg {
     position: relative;
-    height: 80vh;
+    height: 60vh; /* Уменьшено с 80vh до 60vh */
     overflow: hidden;
     background: linear-gradient(120deg, #f6d365, #fda085);
     display: flex;
@@ -9,6 +9,7 @@
     justify-content: center;
     text-align: center;
     color: #fff;
+    padding: 2rem 1rem; /* Добавлен padding для внутреннего отступа */
 }
 
 .interactive-bg::before,
@@ -53,6 +54,8 @@
     z-index: 1;
     position: relative;
     max-width: 700px;
+    margin-bottom: 1rem; /* Уменьшено расстояние до следующей секции */
+    padding: 0 1rem; /* Увеличен внутренний отступ */
 }
 
 .hero-content h1 {

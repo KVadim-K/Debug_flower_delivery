@@ -56,6 +56,19 @@
     --light-btn-buy-now-hover-bg: #ff7043;
 }
 
+/* Установка высоты страницы и flex layout */
+body, html {
+    height: 100%; /* Высота страницы всегда равна высоте окна браузера */
+    display: flex; /* Flexbox для вертикального распределения */
+    flex-direction: column; /* Элементы располагаются вертикально */
+}
+
+.main-content {
+    flex: 1; /* Основной контент занимает всё доступное пространство */
+    display: flex;
+    flex-direction: column;
+}
+
 /* Предпочтение пользователя: уменьшенные или отключённые анимации */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
