@@ -140,3 +140,7 @@ Thumbs.db
 *.crt
 *.pem
 *.key
+[admin_bot]
+[celery]
+[client_bot]
+[web]
