@@ -1,12 +1,12 @@
-# Byte-compiled / optimized / DLL files
+# 🛠 Python
 __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
+# 🛠 C extensions
 *.so
 
-# Distribution / packaging
+# 🛠 Packaging & Distribution
 .Python
 build/
 develop-eggs/
@@ -26,15 +26,15 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# PyInstaller
+# 🛠 PyInstaller
 *.manifest
 *.spec
 
-# Installer logs
+# 🛠 Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
+# 🛠 Unit tests & coverage reports
 htmlcov/
 .tox/
 .nox/
@@ -49,12 +49,11 @@ coverage.xml
 .pytest_cache/
 cover/
 
-# Translations
+# 🛠 Translations
 *.mo
 *.pot
 
-# Django stuff
-*.log
+# 🛠 Django stuff
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -62,45 +61,51 @@ db.sqlite3-journal
 *.db
 *.db-journal
 
-# Flask stuff
+# 🛠 Flask
 instance/
 .webassets-cache
 
-# Static files and media
-/staticfiles/
-/media/
-/assets/
-/uploads/
-
-# Logs
+# 🛠 Logs
+logs/
 *.log
-*.log~
+*.log~  # Временные файлы логов
 **/bot.log
 bot.log
 *.log-*
 
-# Docker
+# 🛠 Docker
 .dockerignore
-Dockerfile
-Dockerfile.*
-docker-compose.yml
+
 docker-compose.override.yml
 docker-compose.yml~
 
-# IDEs and Editors
+# 🛠 IDEs & Editors
 .idea/
 .vscode/
 *.swp
 *.sublime-project
 *.sublime-workspace
 
-# Temporary files
+# 🛠 Temporary & Backup Files
 *.tmp
 *.bak
 *.~tmp
 *.save
+*.swp
+*~
+# Игнорируем резервные файлы, создаваемые редакторами
+*.orig
+*.rej
+*.backup
 
-# Environments
+# 🛠 Static files & Media
+/staticfiles/
+/media/
+/assets/
+uploads/
+uploads_tmp/
+
+# 🛠 Virtual Environments
 .env
 .env.*
 .venv/
@@ -110,21 +115,28 @@ env.bak/
 venv.bak/
 __pypackages__/
 
-# Celery
+# 🛠 Celery
 celerybeat-schedule
 celerybeat.pid
 
-# Static type checkers
+# 🛠 Static type checkers
 .mypy_cache/
 .pytype/
 .pyre/
 .dmypy.json
 dmypy.json
 
-# Debugging
+# 🛠 Debugging
 cython_debug/
 debug.log
 
-# Files for deployment
+# 🛠 Deployment files
 *.yml~
 *.cfg~
+
+# 🛠 Extra files
+Thumbs.db
+.DS_Store
+*.crt
+*.pem
+*.key
